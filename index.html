@@ -339,23 +339,15 @@
                 
                 <div class="learn-more">
                     <h3>Learn More:</h3>
-                    <div class="report-list">
-                        <p>"Understanding 529 Plans"</p>
-                        <p>"Education Tax Credits"</p>
-                        <p>"Investing for Beginners"</p>
-                    </div>
+                    <div class="report-list" id="learnMoreReports"></div>
                 </div>
 
                 <div class="related-topics">
                     <h3>Related Topics:</h3>
-                    <div class="report-list">
-                        <p>"Scholarship Strategies"</p>
-                        <p>"Student Loan Options"</p>
-                        <p>"Budgeting for College"</p>
-                    </div>
+                    <div class="report-list" id="relatedTopicsReports"></div>
                 </div>
 
-                <p class="disclaimer">The suggested recommendations serve as general guidelines but may differ based on your unique financial circumstances.  Contact a financial representative for a more personalized assessment.</p>
+                <p class="disclaimer">The suggested recommendations serve as general guidelines but may differ based on your unique financial circumstances. Contact a financial representative for a more personalized assessment.</p>
                 <button class="download-button" onclick="downloadPDF()">Download Results</button>
             </div>
         </div>
@@ -369,193 +361,256 @@
         <p>Duration: 4 Years</p>
     </div>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.min.js"></script>
-<script>
-    const childAgeInput = document.getElementById('child-age');
-    const currentSavingsInput = document.getElementById('current-savings');
-    const monthlySavingsInput = document.getElementById('monthly-savings');
-    const annualTuitionInput = document.getElementById('annual-tuition');
-    const resultMessage = document.getElementById('resultMessage');
-    const fundingPercentage = document.getElementById('fundingPercentage');
-    const chartCanvas = document.getElementById('fundingChart');
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.min.js"></script>
+    <script>
+        const childAgeInput = document.getElementById('child-age');
+        const currentSavingsInput = document.getElementById('current-savings');
+        const monthlySavingsInput = document.getElementById('monthly-savings');
+        const annualTuitionInput = document.getElementById('annual-tuition');
+        const resultMessage = document.getElementById('resultMessage');
+        const fundingPercentage = document.getElementById('fundingPercentage');
+        const chartCanvas = document.getElementById('fundingChart');
+        const learnMoreReports = document.getElementById('learnMoreReports');
+        const relatedTopicsReports = document.getElementById('relatedTopicsReports');
 
-    const ctx = chartCanvas.getContext('2d');
-    const fundingChart = new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: ['Year 1', 'Year 2', 'Year 3', 'Year 4'],
-            datasets: [
-                {
-                    label: 'Funded Amount ($)',
-                    data: [0, 0, 0, 0],
-                    backgroundColor: '#2ecc71',
-                    borderWidth: 0,
-                    borderRadius: 5
-                },
-                {
-                    label: 'Unfunded Amount ($)',
-                    data: [0, 0, 0, 0],
-                    backgroundColor: '#e74c3c',
-                    borderWidth: 0,
-                    borderRadius: 5
-                }
-            ]
-        },
-        options: {
-            scales: {
-                x: { 
-                    stacked: true,
-                    grid: { display: false },
-                    title: { display: true, text: 'College Years' }
-                },
-                y: { 
-                    stacked: true,
-                    beginAtZero: true,
-                    grid: { color: '#e0e0e0' },
-                    title: { display: true, text: 'Annual Cost ($)' }
-                }
+        const ctx = chartCanvas.getContext('2d');
+        const fundingChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Year 1', 'Year 2', 'Year 3', 'Year 4'],
+                datasets: [
+                    {
+                        label: 'Funded Amount ($)',
+                        data: [0, 0, 0, 0],
+                        backgroundColor: '#2ecc71',
+                        borderWidth: 0,
+                        borderRadius: 5
+                    },
+                    {
+                        label: 'Unfunded Amount ($)',
+                        data: [0, 0, 0, 0],
+                        backgroundColor: '#e74c3c',
+                        borderWidth: 0,
+                        borderRadius: 5
+                    }
+                ]
             },
-            plugins: {
-                legend: { display: true }
+            options: {
+                scales: {
+                    x: { 
+                        stacked: true,
+                        grid: { display: false },
+                        title: { display: true, text: 'College Years' }
+                    },
+                    y: { 
+                        stacked: true,
+                        beginAtZero: true,
+                        grid: { color: '#e0e0e0' },
+                        title: { display: true, text: 'Annual Cost ($)' }
+                    }
+                },
+                plugins: {
+                    legend: { display: true }
+                }
             }
+        });
+
+        const allReports = [
+            "Planning for Kids Going to College",
+            "Choosing a College",
+            "College and Financial Aid Calendar",
+            "Paying for College Today",
+            "Ways to Pay for College",
+            "Education Savings Plans Compared",
+            "How a 529 Education Savings Plan Works",
+            "Saving for College",
+            "Ways to Save for College"
+        ];
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
         }
-    });
 
-    function updateChart() {
-        const childAge = parseFloat(childAgeInput.value) || 0;
-        const currentSavings = parseFloat(currentSavingsInput.value) || 0;
-        const monthlySavings = parseFloat(monthlySavingsInput.value) || 0;
-        const annualTuition = parseFloat(annualTuitionInput.value) || 0;
+        function updateReports(childAge, percentageFunded) {
+            let availableReports = [...allReports];
 
-        const rateOfReturn = 0.06;
-        const tuitionInflationRate = 0.05;
-        const schoolStartAge = 18;
-        const duration = 4;
+            // Filter reports based on rules
+            if (childAge > 15) {
+                availableReports = availableReports.filter(report => 
+                    !["Education Savings Plans Compared", 
+                      "How a 529 Education Savings Plan Works", 
+                      "Saving for College", 
+                      "Ways to Save for College"].includes(report)
+                );
+            }
 
-        const yearsUntilSchool = schoolStartAge - childAge;
-        if (yearsUntilSchool < 0) {
-            resultMessage.textContent = "Child's age exceeds school start age (18).";
-            fundingPercentage.textContent = "";
-            fundingChart.data.datasets[0].data = [0, 0, 0, 0];
-            fundingChart.data.datasets[1].data = [0, 0, 0, 0];
+            let filteredReports = [];
+            if (childAge >= 16) {
+                filteredReports.push("Planning for Kids Going to College");
+                if (percentageFunded <= 70) {
+                    filteredReports.push("College and Financial Aid Calendar");
+                    filteredReports.push("Paying for College Today");
+                }
+            }
+
+            // Remove filtered reports from availableReports to avoid duplicates
+            availableReports = availableReports.filter(report => !filteredReports.includes(report));
+
+            // Randomly select remaining reports
+            const randomReports = shuffleArray(availableReports).slice(0, 3 - filteredReports.length);
+            const learnMoreList = [...filteredReports, ...randomReports];
+
+            // Display reports
+            learnMoreReports.innerHTML = learnMoreList.map(report => `<p>"${report}"</p>`).join('');
+            relatedTopicsReports.innerHTML = shuffleArray(availableReports).slice(0, 3).map(report => `<p>"${report}"</p>`).join('');
+        }
+
+        function updateChart() {
+            const childAge = parseFloat(childAgeInput.value) || 0;
+            const currentSavings = parseFloat(currentSavingsInput.value) || 0;
+            const monthlySavings = parseFloat(monthlySavingsInput.value) || 0;
+            const annualTuition = parseFloat(annualTuitionInput.value) || 0;
+
+            const rateOfReturn = 0.06;
+            const tuitionInflationRate = 0.05;
+            const schoolStartAge = 18;
+            const duration = 4;
+
+            const yearsUntilSchool = schoolStartAge - childAge;
+            if (yearsUntilSchool < 0) {
+                resultMessage.textContent = "Child's age exceeds school start age (18).";
+                fundingPercentage.textContent = "";
+                fundingChart.data.datasets[0].data = [0, 0, 0, 0];
+                fundingChart.data.datasets[1].data = [0, 0, 0, 0];
+                fundingChart.update();
+                updateReports(childAge, 0);
+                return;
+            }
+
+            const futureValueSavings = currentSavings * Math.pow(1 + rateOfReturn, yearsUntilSchool);
+            const futureValueContributions = monthlySavings * 12 * 
+                ((Math.pow(1 + rateOfReturn, yearsUntilSchool) - 1) / rateOfReturn);
+            let totalSavings = futureValueSavings + futureValueContributions;
+
+            const tuitionCosts = [];
+            const fundedAmounts = [];
+            const unfundedAmounts = [];
+            let totalTuitionNeeded = 0;
+
+            for (let year = 0; year < duration; year++) {
+                const inflatedTuition = annualTuition * Math.pow(1 + tuitionInflationRate, yearsUntilSchool + year);
+                tuitionCosts.push(inflatedTuition);
+                totalTuitionNeeded += inflatedTuition;
+
+                if (totalSavings >= inflatedTuition) {
+                    fundedAmounts.push(inflatedTuition);
+                    unfundedAmounts.push(0);
+                    totalSavings -= inflatedTuition;
+                } else {
+                    fundedAmounts.push(totalSavings);
+                    unfundedAmounts.push(inflatedTuition - totalSavings);
+                    totalSavings = 0;
+                }
+            }
+
+            fundingChart.data.datasets[0].data = fundedAmounts;
+            fundingChart.data.datasets[1].data = unfundedAmounts;
             fundingChart.update();
-            return;
-        }
 
-        const futureValueSavings = currentSavings * Math.pow(1 + rateOfReturn, yearsUntilSchool);
-        const futureValueContributions = monthlySavings * 12 * 
-            ((Math.pow(1 + rateOfReturn, yearsUntilSchool) - 1) / rateOfReturn);
-        let totalSavings = futureValueSavings + futureValueContributions;
+            const totalFunded = fundedAmounts.reduce((a, b) => a + b, 0);
+            const percentageFunded = totalTuitionNeeded > 0 ? Math.round(totalFunded / totalTuitionNeeded * 100) : 0;
 
-        const tuitionCosts = [];
-        const fundedAmounts = [];
-        const unfundedAmounts = [];
-        let totalTuitionNeeded = 0;
-
-        for (let year = 0; year < duration; year++) {
-            const inflatedTuition = annualTuition * Math.pow(1 + tuitionInflationRate, yearsUntilSchool + year);
-            tuitionCosts.push(inflatedTuition);
-            totalTuitionNeeded += inflatedTuition;
-
-            if (totalSavings >= inflatedTuition) {
-                fundedAmounts.push(inflatedTuition);
-                unfundedAmounts.push(0);
-                totalSavings -= inflatedTuition;
-            } else {
-                fundedAmounts.push(totalSavings);
-                unfundedAmounts.push(inflatedTuition - totalSavings);
-                totalSavings = 0;
+            let additionalMonthlySavings = 0;
+            if (totalFunded < totalTuitionNeeded) {
+                const shortfall = totalTuitionNeeded - totalFunded;
+                const futureValueFactor = (Math.pow(1 + rateOfReturn, yearsUntilSchool) - 1) / rateOfReturn;
+                additionalMonthlySavings = shortfall / (futureValueFactor * 12);
             }
+
+            resultMessage.textContent = totalFunded >= totalTuitionNeeded ?
+                "Great job! Your savings are on track to fully fund college tuition." :
+                `To reach your goal, you must increase your monthly savings by $${Math.round(additionalMonthlySavings)}.`;
+            
+            fundingPercentage.textContent = `Your current plan provides for ${percentageFunded}% of college to be funded.`;
+
+            // Update the advice text based on conditions
+            const adviceText = document.querySelector('.results-text p:nth-child(3)');
+            if (childAge >= 16 && percentageFunded < 70) {
+                adviceText.textContent = "With college approaching and current savings covering less than 70% of costs, it may be time to explore student loan options to bridge the gap. Consider researching federal and private loans to supplement your funding strategy.";
+            } else {
+                adviceText.textContent = "College tuition and expenses continue to rise, making it essential to plan ahead. By starting early and contributing regularly, you can reduce reliance on student loans and take advantage of tax-advantaged savings options.";
+            }
+
+            // Update reports
+            updateReports(childAge, percentageFunded);
+
+            window.currentResults = {
+                childAge, currentSavings, monthlySavings, annualTuition,
+                fundedAmounts, unfundedAmounts, tuitionCosts, percentageFunded, additionalMonthlySavings
+            };
         }
 
-        fundingChart.data.datasets[0].data = fundedAmounts;
-        fundingChart.data.datasets[1].data = unfundedAmounts;
-        fundingChart.update();
+        function downloadPDF() {
+            const results = window.currentResults || {};
 
-        const totalFunded = fundedAmounts.reduce((a, b) => a + b, 0);
-        const percentageFunded = totalTuitionNeeded > 0 ? Math.round(totalFunded / totalTuitionNeeded * 100) : 0;
+            const chartImage = chartCanvas.toDataURL('image/png');
 
-        let additionalMonthlySavings = 0;
-        if (totalFunded < totalTuitionNeeded) {
-            const shortfall = totalTuitionNeeded - totalFunded;
-            const futureValueFactor = (Math.pow(1 + rateOfReturn, yearsUntilSchool) - 1) / rateOfReturn;
-            additionalMonthlySavings = shortfall / (futureValueFactor * 12);
+            const element = document.createElement('div');
+            element.className = 'pdf-content';
+            element.innerHTML = `
+                <h1 class="pdf-header">College Savings Analysis</h1>
+                <div class="pdf-section">
+                    <h2>Your Inputs</h2>
+                    <p><strong>Child's Age:</strong> ${results.childAge || 0}</p>
+                    <p><strong>Amount Currently Saved:</strong> $${results.currentSavings?.toLocaleString() || 0}</p>
+                    <p><strong>Current Monthly Savings:</strong> $${results.monthlySavings?.toLocaleString() || 0}</p>
+                    <p><strong>Annual Tuition Cost:</strong> $${results.annualTuition?.toLocaleString() || 0}</p>
+                </div>
+                <div class="pdf-section">
+                    <h2>Your Results</h2>
+                    <p><strong>Year 1 Funded/Unfunded:</strong> $${results.fundedAmounts?.[0]?.toLocaleString(undefined, {maximumFractionDigits: 2}) || 0} / $${results.unfundedAmounts?.[0]?.toLocaleString(undefined, {maximumFractionDigits: 2}) || 0}</p>
+                    <p><strong>Year 2 Funded/Unfunded:</strong> $${results.fundedAmounts?.[1]?.toLocaleString(undefined, {maximumFractionDigits: 2}) || 0} / $${results.unfundedAmounts?.[1]?.toLocaleString(undefined, {maximumFractionDigits: 2}) || 0}</p>
+                    <p><strong>Year 3 Funded/Unfunded:</strong> $${results.fundedAmounts?.[2]?.toLocaleString(undefined, {maximumFractionDigits: 2}) || 0} / $${results.unfundedAmounts?.[2]?.toLocaleString(undefined, {maximumFractionDigits: 2}) || 0}</p>
+                    <p><strong>Year 4 Funded/Unfunded:</strong> $${results.fundedAmounts?.[3]?.toLocaleString(undefined, {maximumFractionDigits: 2}) || 0} / $${results.unfundedAmounts?.[3]?.toLocaleString(undefined, {maximumFractionDigits: 2}) || 0}</p>
+                    <p><strong>Percentage Funded:</strong> ${results.percentageFunded || 0}%</p>
+                    <p><strong>Status:</strong> ${resultMessage.textContent}</p>
+                </div>
+                <div class="pdf-section pdf-chart">
+                    <h2>College Funding Outlook</h2>
+                    <img src="${chartImage}" style="max-width: 100%; height: auto;" alt="Funding Chart">
+                </div>
+                <div class="pdf-section">
+                    <h2>Assumptions</h2>
+                    <p><strong>Rate of Return on Savings:</strong> 6%</p>
+                    <p><strong>Tuition Inflation Rate:</strong> 5%</p>
+                    <p><strong>School Starts:</strong> Age 18</p>
+                    <p><strong>Duration:</strong> 4 Years</p>
+                </div>
+                <p class="pdf-disclaimer">The suggested recommendations serve as general guidelines but may differ based on your unique financial circumstances. Contact a financial representative for a more personalized assessment.</p>
+            `;
+
+            const opt = {
+                margin: [0.5, 0.5, 0.5, 0.5],
+                filename: 'College_Savings_Results.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true },
+                jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+            };
+
+            html2pdf().set(opt).from(element).save();
         }
 
-resultMessage.textContent = totalFunded >= totalTuitionNeeded ?
-    "Great job! Your savings are on track to fully fund college tuition." :
-    `To reach your goal, you must increase your monthly savings by $${Math.round(additionalMonthlySavings)}.`;
-        
-        fundingPercentage.textContent = `Your current plan provides for ${percentageFunded}% of college to be funded.`;
+        [childAgeInput, currentSavingsInput, monthlySavingsInput, annualTuitionInput].forEach(input => {
+            input.addEventListener('input', updateChart);
+        });
 
-        // Update the advice text based on conditions
-        const adviceText = document.querySelector('.results-text p:nth-child(3)');
-        if (childAge >= 16 && percentageFunded < 70) {
-            adviceText.textContent = "With college approaching and current savings not covering the tuition costs, it may be time to explore student loan options to bridge the gap. Consider researching federal and private loans to supplement your funding strategy.";
-        } else {
-            adviceText.textContent = "College tuition and expenses continue to rise, making it essential to plan ahead. By starting early and contributing regularly, you can reduce reliance on student loans and take advantage of tax-advantaged savings options.";
-        }
-
-        window.currentResults = {
-            childAge, currentSavings, monthlySavings, annualTuition,
-            fundedAmounts, unfundedAmounts, tuitionCosts, percentageFunded, additionalMonthlySavings
-        };
-    }
-
-    function downloadPDF() {
-        const results = window.currentResults || {};
-
-        const chartImage = chartCanvas.toDataURL('image/png');
-
-        const element = document.createElement('div');
-        element.className = 'pdf-content';
-        element.innerHTML = `
-            <h1 class="pdf-header">College Savings Analysis</h1>
-            <div class="pdf-section">
-                <h2>Your Inputs</h2>
-                <p><strong>Child's Age:</strong> ${results.childAge || 0}</p>
-                <p><strong>Amount Currently Saved:</strong> $${results.currentSavings?.toLocaleString() || 0}</p>
-                <p><strong>Current Monthly Savings:</strong> $${results.monthlySavings?.toLocaleString() || 0}</p>
-                <p><strong>Annual Tuition Cost:</strong> $${results.annualTuition?.toLocaleString() || 0}</p>
-            </div>
-            <div class="pdf-section">
-                <h2>Your Results</h2>
-                <p><strong>Year 1 Funded/Unfunded:</strong> $${results.fundedAmounts?.[0]?.toLocaleString(undefined, {maximumFractionDigits: 2}) || 0} / $${results.unfundedAmounts?.[0]?.toLocaleString(undefined, {maximumFractionDigits: 2}) || 0}</p>
-                <p><strong>Year 2 Funded/Unfunded:</strong> $${results.fundedAmounts?.[1]?.toLocaleString(undefined, {maximumFractionDigits: 2}) || 0} / $${results.unfundedAmounts?.[1]?.toLocaleString(undefined, {maximumFractionDigits: 2}) || 0}</p>
-                <p><strong>Year 3 Funded/Unfunded:</strong> $${results.fundedAmounts?.[2]?.toLocaleString(undefined, {maximumFractionDigits: 2}) || 0} / $${results.unfundedAmounts?.[2]?.toLocaleString(undefined, {maximumFractionDigits: 2}) || 0}</p>
-                <p><strong>Year 4 Funded/Unfunded:</strong> $${results.fundedAmounts?.[3]?.toLocaleString(undefined, {maximumFractionDigits: 2}) || 0} / $${results.unfundedAmounts?.[3]?.toLocaleString(undefined, {maximumFractionDigits: 2}) || 0}</p>
-                <p><strong>Percentage Funded:</strong> ${results.percentageFunded || 0}%</p>
-                <p><strong>Status:</strong> ${resultMessage.textContent}</p>
-            </div>
-            <div class="pdf-section pdf-chart">
-                <h2>College Funding Outlook</h2>
-                <img src="${chartImage}" style="max-width: 100%; height: auto;" alt="Funding Chart">
-            </div>
-            <div class="pdf-section">
-                <h2>Assumptions</h2>
-                <p><strong>Rate of Return on Savings:</strong> 6%</p>
-                <p><strong>Tuition Inflation Rate:</strong> 5%</p>
-                <p><strong>School Starts:</strong> Age 18</p>
-                <p><strong>Duration:</strong> 4 Years</p>
-            </div>
-            <p class="pdf-disclaimer">The suggested recommendations serve as general guidelines but may differ based on your unique financial circumstances.  Contact a financial representative for a more personalized assessment.</p>
-        `;
-
-        const opt = {
-            margin: [0.5, 0.5, 0.5, 0.5],
-            filename: 'College_Savings_Results.pdf',
-            image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: { scale: 2, useCORS: true },
-            jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
-        };
-
-        html2pdf().set(opt).from(element).save();
-    }
-
-    [childAgeInput, currentSavingsInput, monthlySavingsInput, annualTuitionInput].forEach(input => {
-        input.addEventListener('input', updateChart);
-    });
-</script>
+        // Initial call to display reports
+        updateChart();
+    </script>
 </body>
 </html>
