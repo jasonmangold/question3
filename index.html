@@ -488,12 +488,11 @@ resultMessage.textContent = totalFunded >= totalTuitionNeeded ?
     `To reach your goal, you must increase your monthly savings by $${Math.round(additionalMonthlySavings)}.`;
         
         fundingPercentage.textContent = `Your current plan provides for ${percentageFunded}% of college to be funded.`;
-        <br>
 
         // Update the advice text based on conditions
         const adviceText = document.querySelector('.results-text p:nth-child(3)');
         if (childAge >= 16 && percentageFunded < 70) {
-            adviceText.textContent = "With college approaching and current savings not covering the tuition costs, it may be time to explore student loan options to bridge the gap. Consider researching federal and private loans to supplement your funding strategy."<br>;
+            adviceText.textContent = "With college approaching and current savings not covering the tuition costs, it may be time to explore student loan options to bridge the gap. Consider researching federal and private loans to supplement your funding strategy.";
         } else {
             adviceText.textContent = "College tuition and expenses continue to rise, making it essential to plan ahead. By starting early and contributing regularly, you can reduce reliance on student loans and take advantage of tax-advantaged savings options.";
         }
