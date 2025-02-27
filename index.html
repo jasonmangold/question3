@@ -344,7 +344,11 @@
 
                 <div class="related-topics">
                     <h3>Related Topics:</h3>
-                    <div class="report-list" id="relatedTopicsReports"></div>
+                    <div class="report-list">
+                        <p>"Scholarship Strategies"</p>
+                        <p>"Student Loan Options"</p>
+                        <p>"Budgeting for College"</p>
+                    </div>
                 </div>
 
                 <p class="disclaimer">The suggested recommendations serve as general guidelines but may differ based on your unique financial circumstances. Contact a financial representative for a more personalized assessment.</p>
@@ -372,7 +376,6 @@
         const fundingPercentage = document.getElementById('fundingPercentage');
         const chartCanvas = document.getElementById('fundingChart');
         const learnMoreReports = document.getElementById('learnMoreReports');
-        const relatedTopicsReports = document.getElementById('relatedTopicsReports');
 
         const ctx = chartCanvas.getContext('2d');
         const fundingChart = new Chart(ctx, {
@@ -416,7 +419,7 @@
             }
         });
 
-        const allReports = [
+        const allLearnMoreReports = [
             "Planning for Kids Going to College",
             "Choosing a College",
             "College and Financial Aid Calendar",
@@ -436,10 +439,10 @@
             return array;
         }
 
-        function updateReports(childAge, percentageFunded) {
-            let availableReports = [...allReports];
+        function updateLearnMoreReports(childAge, percentageFunded) {
+            let availableReports = [...allLearnMoreReports];
 
-            // Filter reports based on rules
+            // Filter out savings reports if age > 15
             if (childAge > 15) {
                 availableReports = availableReports.filter(report => 
                     !["Education Savings Plans Compared", 
@@ -449,6 +452,7 @@
                 );
             }
 
+            // Specific reports with conditions
             let filteredReports = [];
             if (childAge >= 16) {
                 filteredReports.push("Planning for Kids Going to College");
@@ -461,13 +465,12 @@
             // Remove filtered reports from availableReports to avoid duplicates
             availableReports = availableReports.filter(report => !filteredReports.includes(report));
 
-            // Randomly select remaining reports
+            // Randomly select remaining reports to reach max of 3 total
             const randomReports = shuffleArray(availableReports).slice(0, 3 - filteredReports.length);
             const learnMoreList = [...filteredReports, ...randomReports];
 
             // Display reports
             learnMoreReports.innerHTML = learnMoreList.map(report => `<p>"${report}"</p>`).join('');
-            relatedTopicsReports.innerHTML = shuffleArray(availableReports).slice(0, 3).map(report => `<p>"${report}"</p>`).join('');
         }
 
         function updateChart() {
@@ -488,7 +491,7 @@
                 fundingChart.data.datasets[0].data = [0, 0, 0, 0];
                 fundingChart.data.datasets[1].data = [0, 0, 0, 0];
                 fundingChart.update();
-                updateReports(childAge, 0);
+                updateLearnMoreReports(childAge, 0);
                 return;
             }
 
@@ -546,8 +549,8 @@
                 adviceText.textContent = "College tuition and expenses continue to rise, making it essential to plan ahead. By starting early and contributing regularly, you can reduce reliance on student loans and take advantage of tax-advantaged savings options.";
             }
 
-            // Update reports
-            updateReports(childAge, percentageFunded);
+            // Update Learn More reports
+            updateLearnMoreReports(childAge, percentageFunded);
 
             window.currentResults = {
                 childAge, currentSavings, monthlySavings, annualTuition,
