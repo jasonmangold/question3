@@ -344,11 +344,7 @@
 
                 <div class="related-topics">
                     <h3>Related Topics:</h3>
-                    <div class="report-list">
-                        <p>"Scholarship Strategies"</p>
-                        <p>"Student Loan Options"</p>
-                        <p>"Budgeting for College"</p>
-                    </div>
+                    <div class="report-list" id="relatedTopicsReports"></div>
                 </div>
 
                 <p class="disclaimer">The suggested recommendations serve as general guidelines but may differ based on your unique financial circumstances. Contact a financial representative for a more personalized assessment.</p>
@@ -376,6 +372,7 @@
         const fundingPercentage = document.getElementById('fundingPercentage');
         const chartCanvas = document.getElementById('fundingChart');
         const learnMoreReports = document.getElementById('learnMoreReports');
+        const relatedTopicsReports = document.getElementById('relatedTopicsReports');
 
         const ctx = chartCanvas.getContext('2d');
         const fundingChart = new Chart(ctx, {
@@ -431,6 +428,33 @@
             "Ways to Save for College"
         ];
 
+        const relatedReports = [
+            {title: "Accumulation Goals", category: "General"},
+            {title: "Basic Steps in the Financial Planning Process", category: "General"},
+            {title: "Choose the Financial Planning Team", category: "General"},
+            {title: "Debt Repayment Strategies", category: "Debt"},
+            {title: "Managing Your Debt", category: "Debt"},
+            {title: "Time and Growth of Money", category: "Investing"},
+            {title: "Individual Disability Income Insurance", category: "Disability"},
+            {title: "The Impact of Disability", category: "Disability"},
+            {title: "The Individual Need for Disability Insurance", category: "Disability"},
+            {title: "Asset Allocation", category: "Investing"},
+            {title: "Pyramid of Investments", category: "Investing"},
+            {title: "The Need for Retirement Planning", category: "Retirement"},
+            {title: "How a Roth IRA Works", category: "Retirement"},
+            {title: "IRAs Compared", category: "Retirement"},
+            {title: "How a 401(k) Cash or Deferred Plan Works", category: "Retirement"},
+            {title: "General Purposes of Life Insurance", category: "Life Insurance"},
+            {title: "Term Life Insurance", category: "Life Insurance"},
+            {title: "The Need for Responsible Planning", category: "Life Insurance"},
+            {title: "Using Cash Value Life Insurance", category: "Life Insurance"},
+            {title: "Advantages of a Will", category: "Estate"},
+            {title: "Avoiding Probate", category: "Estate"},
+            {title: "Choose the Estate Planning Team", category: "Estate"},
+            {title: "The Importance of Beneficiary Designations", category: "Estate"},
+            {title: "The Need for Estate Planning", category: "Estate"}
+        ];
+
         function shuffleArray(array) {
             for (let i = array.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
@@ -442,7 +466,6 @@
         function updateLearnMoreReports(childAge, percentageFunded) {
             let availableReports = [...allLearnMoreReports];
 
-            // Filter out savings reports if age > 15
             if (childAge > 15) {
                 availableReports = availableReports.filter(report => 
                     !["Education Savings Plans Compared", 
@@ -452,7 +475,6 @@
                 );
             }
 
-            // Specific reports with conditions
             let filteredReports = [];
             if (childAge >= 16) {
                 filteredReports.push("Planning for Kids Going to College");
@@ -462,15 +484,25 @@
                 }
             }
 
-            // Remove filtered reports from availableReports to avoid duplicates
             availableReports = availableReports.filter(report => !filteredReports.includes(report));
-
-            // Randomly select remaining reports to reach max of 3 total
             const randomReports = shuffleArray(availableReports).slice(0, 3 - filteredReports.length);
             const learnMoreList = [...filteredReports, ...randomReports];
-
-            // Display reports
             learnMoreReports.innerHTML = learnMoreList.map(report => `<p>"${report}"</p>`).join('');
+        }
+
+        function updateRelatedTopics() {
+            const shuffledReports = shuffleArray([...relatedReports]);
+            const selectedReports = [];
+            const usedCategories = new Set();
+
+            for (const report of shuffledReports) {
+                if (!usedCategories.has(report.category) && selectedReports.length < 3) {
+                    selectedReports.push(report.title);
+                    usedCategories.add(report.category);
+                }
+            }
+
+            relatedTopicsReports.innerHTML = selectedReports.map(report => `<p>"${report}"</p>`).join('');
         }
 
         function updateChart() {
@@ -492,6 +524,7 @@
                 fundingChart.data.datasets[1].data = [0, 0, 0, 0];
                 fundingChart.update();
                 updateLearnMoreReports(childAge, 0);
+                updateRelatedTopics();
                 return;
             }
 
@@ -541,7 +574,6 @@
             
             fundingPercentage.textContent = `Your current plan provides for ${percentageFunded}% of college to be funded.`;
 
-            // Update the advice text based on conditions
             const adviceText = document.querySelector('.results-text p:nth-child(3)');
             if (childAge >= 16 && percentageFunded < 70) {
                 adviceText.textContent = "With college approaching and current savings covering less than 70% of costs, it may be time to explore student loan options to bridge the gap. Consider researching federal and private loans to supplement your funding strategy.";
@@ -549,8 +581,8 @@
                 adviceText.textContent = "College tuition and expenses continue to rise, making it essential to plan ahead. By starting early and contributing regularly, you can reduce reliance on student loans and take advantage of tax-advantaged savings options.";
             }
 
-            // Update Learn More reports
             updateLearnMoreReports(childAge, percentageFunded);
+            updateRelatedTopics();
 
             window.currentResults = {
                 childAge, currentSavings, monthlySavings, annualTuition,
@@ -612,7 +644,6 @@
             input.addEventListener('input', updateChart);
         });
 
-        // Initial call to display reports
         updateChart();
     </script>
 </body>
